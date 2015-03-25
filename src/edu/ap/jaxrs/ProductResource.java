@@ -7,6 +7,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.*;
 import javax.xml.bind.*;
 
+import javax.json.*;
+
 @RequestScoped
 @Path("/products")
 public class ProductResource {
@@ -67,7 +69,7 @@ public class ProductResource {
 	}
 	
 	@GET
-	@Produces({"text/xml"})
+	@Produces({"text/json"})
 	public String getProductsXML() {
 		String content = "";
 		File JSONfile = new File("D:/Deborah/Mijn Documenten/Artesis Plantijn/Academiejaar 3/Semester 2/Webtechnology 3/Eclipse/Workspace/REST/Products.json");
@@ -113,7 +115,7 @@ public class ProductResource {
 	
 	@GET
 	@Path("/{shortname}")
-	@Produces({"text/xml"})
+	@Produces({"text/json"})
 	public String getProductXML(@PathParam("shortname") String shortname) {
 		String xmlString = "";
 		try {
@@ -143,7 +145,7 @@ public class ProductResource {
 	}
 	
 	@POST
-	@Consumes({"text/xml"})
+	@Consumes({"text/json"})
 	public void processFromXML(String productsJSON) {
 		
 		/* newProductXML should look like this :
@@ -170,6 +172,7 @@ public class ProductResource {
 			// unmarshal new product
 			JAXBContext jaxbContext2 = JAXBContext.newInstance(Product.class);
 			Unmarshaller jaxbUnmarshaller2 = jaxbContext2.createUnmarshaller();
+			jaxbUnmarshaller2.setProperty(Unmarshaller.MEDIA_TYPE,"application/json");
 			StringReader reader = new StringReader(productsJSON);
 			Product newProduct = (Product)jaxbUnmarshaller2.unmarshal(reader);
 			
@@ -180,6 +183,8 @@ public class ProductResource {
 			
 			// marshal the updated productsXML object
 			Marshaller jaxbMarshaller = jaxbContext1.createMarshaller();
+			jaxbMarshaller.setProperty(Marshaller.MEDIA_TYPE,"application/json");
+			jaxbMarshaller.setProperty(Marshaller.JSON_INCLUDE_ROOT, true);
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			jaxbMarshaller.marshal(productsJSON, JSONfile);
 		} 
